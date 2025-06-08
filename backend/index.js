@@ -319,7 +319,12 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
     return res.status(404).json({ error: 'Not found' });
   }
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+  const indexPath = path.join(__dirname, '../frontend/build/index.html');
+  if (!fs.existsSync(indexPath)) {
+    console.error('ERROR: frontend/build/index.html not found. Make sure the frontend is built before starting the backend.');
+    return res.status(500).send('Frontend build not found. Please run "npm run build" in the frontend directory.');
+  }
+  res.sendFile(indexPath);
 });
 
 const PORT = process.env.PORT || 5000;
