@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GrView } from "react-icons/gr";
-import { FaEdit } from "react-icons/fa";
-import { TiDelete } from "react-icons/ti";
 
 const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/forms`;
@@ -186,7 +183,7 @@ const FormsListPage: React.FC = () => {
                       tabIndex={0}
                       aria-label={`View form for ${form.patientName}`}
                     >
-                      <GrView />
+                      👁
                     </button>
                     {(userRole === 'Registered Surgical Assistant' || userRole === 'Business Assistant') && (
                       <button
@@ -207,7 +204,7 @@ const FormsListPage: React.FC = () => {
                         tabIndex={0}
                         aria-label={`Edit form for ${form.patientName}`}
                       >
-                        <FaEdit />  
+                        ✏  
                       </button>
                     )}
                     {(userRole === 'Registered Surgical Assistant' || userRole === 'Business Assistant') && (
@@ -241,7 +238,7 @@ const FormsListPage: React.FC = () => {
                         tabIndex={0}
                         aria-label={`Delete form for ${form.patientName}`}
                       >
-                        <TiDelete />
+                        ❌
                       </button>
                     )}
                     {userRole === 'Business Assistant' && form.status !== 'processed' && (
