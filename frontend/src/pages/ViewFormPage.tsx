@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SurgicalForm } from '../types/SurgicalForm';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/forms`;
 const AUDIT_ACTION_URL = `${API_BASE_URL}/audit-action`;
 
@@ -118,7 +118,7 @@ const ViewFormPage: React.FC = () => {
               <div style={{ margin: '12px 0' }}>
                 <b>Surgery Form Image:</b><br />
                 <img
-                  src={`${process.env.REACT_APP_API_URL?.replace('/api','') || 'http://localhost:4000'}${form.surgeryFormFileUrl}`}
+                  src={`${form.surgeryFormFileUrl}`}
                   alt="Surgery Form"
                   style={{ maxWidth: '100%', maxHeight: 300, borderRadius: 8, marginTop: 8, cursor: 'zoom-in' }}
                   onClick={() => setLightboxOpen(true)}
@@ -148,7 +148,7 @@ const ViewFormPage: React.FC = () => {
                   >
                     <div style={{ position: 'relative', marginBottom: 24 }} onClick={e => e.stopPropagation()}>
                       <img
-                        src={`${process.env.REACT_APP_API_URL?.replace('/api','') || 'http://localhost:4000'}${form.surgeryFormFileUrl}`}
+                        src={`${form.surgeryFormFileUrl}`}
                         alt="Surgery Form Fullscreen"
                         style={{
                           maxWidth: '90vw',

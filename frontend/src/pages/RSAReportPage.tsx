@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveAs } from 'file-saver';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = '/api';
 const FORMS_API_URL = `${API_BASE_URL}/forms`;
 const USERS_API_URL = `${API_BASE_URL}/users`;
 const CALL_HOURS_API_URL = `${API_BASE_URL}/call-hours`;

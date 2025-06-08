@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/call-hours`;
 const USERS_API_URL = `${API_BASE_URL}/users`;
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+// Use relative URLs for API endpoints so frontend works both locally and when deployed
+const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/users`;
 
 const UserManagementPage: React.FC = () => {

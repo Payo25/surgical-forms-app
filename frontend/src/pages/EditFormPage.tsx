@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SurgicalForm } from '../types/SurgicalForm';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/forms`;
 const AUDIT_ACTION_URL = `${API_BASE_URL}/audit-action`;
 
@@ -167,7 +167,7 @@ const EditFormPage: React.FC = () => {
             {form.surgeryFormFileUrl && (
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Uploaded Image</label>
-                <img src={`${process.env.REACT_APP_API_URL?.replace('/api','') || 'http://localhost:4000'}${form.surgeryFormFileUrl}`} alt="Surgery Form" style={{ maxWidth: '100%', borderRadius: 8 }} />
+                <img src={`${form.surgeryFormFileUrl}`} alt="Surgery Form" style={{ maxWidth: '100%', borderRadius: 8 }} />
               </div>
             )}
             {error && <div style={{ color: '#e74c3c', marginBottom: 12, textAlign: 'center' }}>{error}</div>}

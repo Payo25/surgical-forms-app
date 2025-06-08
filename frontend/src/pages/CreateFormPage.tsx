@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/forms`;
 const AUDIT_ACTION_URL = `${API_BASE_URL}/audit-action`;
 
