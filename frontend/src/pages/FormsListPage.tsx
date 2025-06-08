@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GrView } from "react-icons/gr";
+import { FaEdit } from "react-icons/fa";
+import { TiDelete } from "react-icons/ti";
 
 const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/forms`;
@@ -183,7 +186,7 @@ const FormsListPage: React.FC = () => {
                       tabIndex={0}
                       aria-label={`View form for ${form.patientName}`}
                     >
-                      View
+                      <GrView />
                     </button>
                     {(userRole === 'Registered Surgical Assistant' || userRole === 'Business Assistant') && (
                       <button
@@ -204,30 +207,43 @@ const FormsListPage: React.FC = () => {
                         tabIndex={0}
                         aria-label={`Edit form for ${form.patientName}`}
                       >
-                        Edit
+                        <FaEdit />  
                       </button>
                     )}
-                    {/* Example delete button, if you have delete functionality: */}
-                    {/* <button
-                      onClick={() => handleDelete(form.id)}
-                      style={{
-                        padding: '6px 16px',
-                        borderRadius: 6,
-                        background: 'linear-gradient(90deg, #e74c3c 0%, #e67e22 100%)',
-                        color: '#fff',
-                        border: 'none',
-                        fontWeight: 600,
-                        fontSize: 14,
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(231,76,60,0.08)',
-                        transition: 'background 0.2s',
-                        marginRight: 8
-                      }}
-                      tabIndex={0}
-                      aria-label={`Delete form for ${form.patientName}`}
-                    >
-                      Delete
-                    </button> */}
+                    {(userRole === 'Registered Surgical Assistant' || userRole === 'Business Assistant') && (
+                      <button
+                        onClick={async () => {
+                          if (!window.confirm(`Are you sure you want to delete the form for ${form.patientName}?`)) return;
+                          try {
+                            const res = await fetch(`${API_URL}/${form.id}`, { method: 'DELETE' });
+                            if (res.ok) {
+                              setForms(forms => forms.filter(f => f.id !== form.id));
+                            } else {
+                              alert('Failed to delete form.');
+                            }
+                          } catch {
+                            alert('Failed to delete form.');
+                          }
+                        }}
+                        style={{
+                          padding: '6px 16px',
+                          borderRadius: 6,
+                          background: 'linear-gradient(90deg, #e74c3c 0%, #e67e22 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          fontWeight: 600,
+                          fontSize: 14,
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 8px rgba(231,76,60,0.08)',
+                          transition: 'background 0.2s',
+                          marginRight: 8
+                        }}
+                        tabIndex={0}
+                        aria-label={`Delete form for ${form.patientName}`}
+                      >
+                        <TiDelete />
+                      </button>
+                    )}
                     {userRole === 'Business Assistant' && form.status !== 'processed' && (
                       <button
                         onClick={async () => {
