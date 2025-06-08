@@ -43,7 +43,26 @@ const upload = multer({ storage: storage });
 app.get('/api/forms', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM forms ORDER BY id DESC');
-    res.json(result.rows);
+    // Map DB fields to camelCase for frontend compatibility
+    const forms = result.rows.map(form => ({
+      id: form.id,
+      patientName: form.patientname,
+      dob: form.dob,
+      insuranceCompany: form.insurancecompany,
+      healthCenterName: form.healthcentername,
+      date: form.date,
+      timeIn: form.timein,
+      timeOut: form.timeout,
+      doctorName: form.doctorname,
+      procedure: form.procedure,
+      caseType: form.casetype,
+      status: form.status,
+      createdBy: form.createdby,
+      surgeryFormFileUrl: form.surgeryformfileurl,
+      createdAt: form.createdat,
+      lastModified: form.lastmodified,
+    }));
+    res.json(forms);
   } catch (err) {
     res.status(500).json({ error: 'Database error' });
   }
