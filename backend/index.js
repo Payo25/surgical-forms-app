@@ -16,6 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Log all environment variables at startup for debugging
+// console.log('ENV VARS:', process.env);
+
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -35,91 +38,6 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage: storage });
-
-// --- Storage abstraction ---
-const useFirestore = false; // Set to false to use in-memory storage for development
-
-let firestore = null;
-let formsCollection, usersCollection, auditLogsCollection;
-if (useFirestore) {
-  const { Firestore } = require('@google-cloud/firestore');
-  const firestoreClient = new Firestore({
-    projectId: process.env.GCLOUD_PROJECT || 'your-gcp-project-id',
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS || 'path-to-service-account.json',
-  });
-  formsCollection = firestoreClient.collection('forms');
-  usersCollection = firestoreClient.collection('users');
-  auditLogsCollection = firestoreClient.collection('auditLogs');
-  firestore = {
-    async getForms() {
-      const snapshot = await formsCollection.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    },
-    async getFormById(id) {
-      const doc = await formsCollection.doc(id).get();
-      return doc.exists ? { id: doc.id, ...doc.data() } : null;
-    },
-    async createForm(form) {
-      const ref = await formsCollection.add(form);
-      return { id: ref.id, ...form };
-    },
-    async updateForm(id, data) {
-      await formsCollection.doc(id).update(data);
-      const doc = await formsCollection.doc(id).get();
-      return doc.exists ? { id: doc.id, ...doc.data() } : null;
-    },
-    async deleteForm(id) {
-      await formsCollection.doc(id).delete();
-    },
-    async getUsers() {
-      const snapshot = await usersCollection.get();
-      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    },
-    async createUser(user) {
-      const ref = await usersCollection.add(user);
-      return { id: ref.id, ...user };
-    },
-    async updateUser(id, data) {
-      await usersCollection.doc(id).update(data);
-      const doc = await usersCollection.doc(id).get();
-      return doc.exists ? { id: doc.id, ...doc.data() } : null;
-    },
-    async deleteUser(id) {
-      await usersCollection.doc(id).delete();
-    },
-    async getAuditLogs() {
-      const snapshot = await auditLogsCollection.orderBy('timestamp', 'desc').get();
-      return snapshot.docs.map(doc => doc.data());
-    },
-    async addAuditLog(log) {
-      await auditLogsCollection.add(log);
-    },
-  };
-} else {
-  firestore = {
-    async getForms() { return forms; },
-    async getFormById(id) { return forms.find(f => f.id === id); },
-    async createForm(form) { forms.push(form); return form; },
-    async updateForm(id, data) {
-      const idx = forms.findIndex(f => f.id === id);
-      if (idx === -1) return null;
-      forms[idx] = { ...forms[idx], ...data, lastModified: new Date().toISOString() };
-      return forms[idx];
-    },
-    async deleteForm(id) { forms = forms.filter(f => f.id !== id); },
-    async getUsers() { return users; },
-    async createUser(user) { users.push(user); return user; },
-    async updateUser(id, data) {
-      const idx = users.findIndex(u => u.id === id);
-      if (idx === -1) return null;
-      users[idx] = { ...users[idx], ...data };
-      return users[idx];
-    },
-    async deleteUser(id) { users = users.filter(u => u.id !== id); },
-    async getAuditLogs() { return auditLogs; },
-    async addAuditLog(log) { auditLogs.push(log); },
-  };
-}
 
 // --- Forms API using PostgreSQL ---
 app.get('/api/forms', async (req, res) => {
@@ -314,7 +232,7 @@ app.post('/api/call-hours', async (req, res) => {
 });
 
 // Catch-all: serve React app for all non-API, non-static routes
-app.get('*', (req, res) => {
+app.get(/(.*)/, (req, res) => {
   // If the request starts with /api or /uploads, skip
   if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
     return res.status(404).json({ error: 'Not found' });
