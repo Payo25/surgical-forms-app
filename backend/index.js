@@ -73,14 +73,15 @@ app.get('/api/forms/:id', async (req, res) => {
     const result = await pool.query('SELECT * FROM forms WHERE id = $1', [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
     const form = result.rows[0];
-    // Map DB fields to camelCase for frontend compatibility
+    // Format dates for HTML input compatibility
+    const formatDate = (d) => d ? new Date(d).toISOString().slice(0, 10) : '';
     const camelCaseForm = {
       id: form.id,
       patientName: form.patientname,
-      dob: form.dob,
+      dob: formatDate(form.dob),
       insuranceCompany: form.insurancecompany,
       healthCenterName: form.healthcentername,
-      date: form.date,
+      date: formatDate(form.date),
       timeIn: form.timein,
       timeOut: form.timeout,
       doctorName: form.doctorname,

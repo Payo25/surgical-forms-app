@@ -172,7 +172,7 @@ const CreateFormPage: React.FC = () => {
             />
           </div>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Date</label>
+            <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Surgery Date</label>
             <input
               type="date"
               value={date}

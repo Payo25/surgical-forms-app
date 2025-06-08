@@ -101,7 +101,7 @@ const ViewFormPage: React.FC = () => {
         {form && (
           <div style={{ textAlign: 'left', maxWidth: 400, margin: '0 auto' }}>
             <p><b>Patient Name:</b> {form.patientName}</p>
-            <p><b>Date of Birth:</b> {form.dob}</p>
+            <p><b>Date of Birth:</b> {form.dob ? new Date(form.dob).toLocaleDateString() : ''}</p>
             <p><b>Insurance Company:</b> {form.insuranceCompany}</p>
             <p><b>Health Center Name:</b> {form.healthCenterName}</p>
             <p><b>Surgery Date:</b> {form.date ? new Date(form.date).toLocaleDateString() : ''}</p>
