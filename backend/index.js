@@ -258,14 +258,18 @@ function logAudit(action, actor, details) {
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Missing username or password' });
-  const allUsers = useFirestore ? await firestore.getUsers() : users;
-  const user = allUsers.find(u => u.username === username);
-  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json({ error: 'Invalid credentials' });
-  logAudit('LOGIN', username, { userId: user.id });
-  // Send fullName in response and also set it in localStorage on the frontend
-  res.json({ id: user.id, username: user.username, role: user.role, fullName: user.fullName || '' });
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    const user = result.rows[0];
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+    logAudit('LOGIN', username, { userId: user.id });
+    res.json({ id: user.id, username: user.username, role: user.role, fullName: user.fullname || user.fullName });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // --- Call Hours Monthly Planner using PostgreSQL ---
