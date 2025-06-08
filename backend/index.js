@@ -330,4 +330,16 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  // Log all registered routes for debugging
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      console.log('Route:', middleware.route.path);
+    } else if (middleware.name === 'router') {
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          console.log('Route:', handler.route.path);
+        }
+      });
+    }
+  });
 });
