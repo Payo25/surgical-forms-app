@@ -71,7 +71,7 @@ const FormsListPage: React.FC = () => {
       const row = [
         '"' + (form.id || '') + '"',
         '"' + (form.patientName || '') + '"',
-        '"' + (form.dob || '') + '"',
+        '"' + (new Date(form.dob).toLocaleString() || '') + '"',
         '"' + (form.insuranceCompany || '') + '"',
         '"' + (form.healthCenterName || '') + '"',
         '"' + (form.date || '') + '"', // Surgery date
