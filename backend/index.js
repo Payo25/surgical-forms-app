@@ -108,8 +108,13 @@ app.delete('/api/forms/:id', async (req, res) => {
 // --- Users API using PostgreSQL ---
 app.get('/api/users', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, username, role, fullName FROM users ORDER BY id DESC');
-    res.json(result.rows);
+    const result = await pool.query('SELECT id, username, role, fullname FROM users ORDER BY id DESC');
+    // Map fullname to fullName for frontend compatibility
+    const users = result.rows.map(user => ({
+      ...user,
+      fullName: user.fullname
+    }));
+    res.json(users);
   } catch (err) {
     res.status(500).json({ error: 'Database error' });
   }
