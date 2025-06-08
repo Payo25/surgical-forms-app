@@ -313,6 +313,15 @@ app.post('/api/call-hours', async (req, res) => {
   }
 });
 
+// Catch-all: serve React app for all non-API, non-static routes
+app.get('*', (req, res) => {
+  // If the request starts with /api or /uploads, skip
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
