@@ -149,9 +149,11 @@ app.delete('/api/forms/:id', async (req, res) => {
 app.get('/api/users', async (req, res) => {
   try {
     const result = await pool.query('SELECT id, username, role, fullname FROM users ORDER BY id DESC');
-    // Map fullname to fullName for frontend compatibility
+    // Map fullname to fullName for frontend compatibility and remove raw fullname
     const users = result.rows.map(user => ({
-      ...user,
+      id: user.id,
+      username: user.username,
+      role: user.role,
       fullName: user.fullname
     }));
     res.json(users);
