@@ -62,15 +62,17 @@ const CallHoursPage: React.FC = () => {
     const dateKey = getDateString(year, month, day);
     setAssignments(prev => {
       const prevList = prev[dateKey] || [];
-      if (prevList.includes(rsaId)) return prev;
-      return { ...prev, [dateKey]: [...prevList, rsaId] };
+      const rsaIdStr = String(rsaId); // Ensure string
+      if (prevList.includes(rsaIdStr)) return prev;
+      return { ...prev, [dateKey]: [...prevList, rsaIdStr] };
     });
   };
   const handleRemoveRSA = (day: number, rsaId: string) => {
     const dateKey = getDateString(year, month, day);
     setAssignments(prev => {
       const prevList = prev[dateKey] || [];
-      return { ...prev, [dateKey]: prevList.filter(id => id !== rsaId) };
+      const rsaIdStr = String(rsaId); // Ensure string
+      return { ...prev, [dateKey]: prevList.filter(id => id !== rsaIdStr) };
     });
   };
 
@@ -199,7 +201,7 @@ const CallHoursPage: React.FC = () => {
                             <div style={{ fontWeight: 600, marginBottom: 4 }}>{thisDay}</div>
                             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                               {assigned.map(rsaId => {
-                                const rsa = users.find(u => u.id === rsaId);
+                                const rsa = users.find(u => String(u.id) === String(rsaId));
                                 if (!rsa) return null;
                                 return (
                                   <li key={rsaId} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
