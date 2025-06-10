@@ -121,7 +121,9 @@ app.post('/api/forms', upload.single('surgeryFormFile'), async (req, res) => {
 
 app.put('/api/forms/:id', async (req, res) => {
   try {
-    const fields = Object.keys(req.body);
+    // Map camelCase to snake_case for DB
+    const snakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    const fields = Object.keys(req.body).map(snakeCase);
     const values = Object.values(req.body);
     if (fields.length === 0) return res.status(400).json({ error: 'No fields to update' });
     const setClause = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');

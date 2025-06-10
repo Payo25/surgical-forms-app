@@ -28,7 +28,8 @@ const EditFormPage: React.FC = () => {
       });
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Accept <select> as well for handleChange
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     if (!form) return;
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -154,7 +155,11 @@ const EditFormPage: React.FC = () => {
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Case Type</label>
-              <input type="text" name="caseType" value={form.caseType} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} />
+              <select name="caseType" value={form.caseType} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}>
+                <option value="Regular">Regular</option>
+                <option value="Shift<3">Shift&lt;3</option>
+                <option value="Shift>3">Shift&gt;3</option>
+              </select>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Status</label>
