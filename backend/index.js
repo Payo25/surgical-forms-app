@@ -119,7 +119,8 @@ app.post('/api/forms', upload.single('surgeryFormFile'), async (req, res) => {
   }
 });
 
-app.put('/api/forms/:id', async (req, res) => {
+// --- PATCH: Support multipart/form-data for editing forms with/without file ---
+app.put('/api/forms/:id', upload.single('surgeryFormFile'), async (req, res) => {
   try {
     // Explicit mapping from camelCase to DB columns
     const fieldMap = {
@@ -139,13 +140,27 @@ app.put('/api/forms/:id', async (req, res) => {
       createdAt: 'createdat',
       lastModified: 'lastmodified',
     };
+    // Use req.body for text fields, req.file for file
     const fields = Object.keys(req.body).filter(k => fieldMap[k]);
     const values = fields.map(k => req.body[k]);
-    if (fields.length === 0) return res.status(400).json({ error: 'No fields to update' });
-    const setClause = fields.map((k, i) => `${fieldMap[k]} = $${i + 1}`).join(', ');
+    let setClause = fields.map((k, i) => `${fieldMap[k]} = $${i + 1}`).join(', ');
+    let paramCount = fields.length;
+    // If a new file is uploaded, update surgeryFormFileUrl
+    if (req.file) {
+      paramCount++;
+      setClause += (setClause ? ', ' : '') + `surgeryformfileurl = $${paramCount}`;
+      values.push(`/uploads/${req.file.filename}`);
+    }
+    // Always update lastModified
+    paramCount++;
+    setClause += (setClause ? ', ' : '') + `lastmodified = $${paramCount}`;
+    values.push(new Date().toISOString());
+    // id param
+    paramCount++;
+    values.push(req.params.id);
     const result = await pool.query(
-      `UPDATE forms SET ${setClause}, lastmodified = $${fields.length + 1} WHERE id = $${fields.length + 2} RETURNING *`,
-      [...values, new Date().toISOString(), req.params.id]
+      `UPDATE forms SET ${setClause} WHERE id = $${paramCount} RETURNING *`,
+      values
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
     res.json(result.rows[0]);

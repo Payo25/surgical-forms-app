@@ -12,6 +12,7 @@ const EditFormPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role') || 'Registered Surgical Assistant';
 
@@ -40,10 +41,16 @@ const EditFormPage: React.FC = () => {
     setSuccess('');
     if (!form) return;
     try {
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value as string);
+      });
+      if (selectedFile) {
+        formData.append('surgeryFormFile', selectedFile);
+      }
       const res = await fetch(`${API_URL}/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: formData,
       });
       if (!res.ok) throw new Error('Failed to update form');
       setSuccess('Form updated successfully!');
@@ -169,12 +176,20 @@ const EditFormPage: React.FC = () => {
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Surgery Date</label>
               <input type="date" name="date" value={form.date} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} />
             </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Upload Surgery Form Image</label>
+              <input type="file" id="surgeryFormFileInput" name="surgeryFormFile" accept="image/*" />
+            </div>
             {form.surgeryFormFileUrl && (
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Uploaded Image</label>
                 <img src={`${form.surgeryFormFileUrl}`} alt="Surgery Form" style={{ maxWidth: '100%', borderRadius: 8 }} />
               </div>
             )}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Update Surgery Form Image</label>
+              <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files ? e.target.files[0] : null)} />
+            </div>
             {error && <div style={{ color: '#e74c3c', marginBottom: 12, textAlign: 'center' }}>{error}</div>}
             {success && <div style={{ color: '#43cea2', marginBottom: 12, textAlign: 'center' }}>{success}</div>}
             <button type="submit"
