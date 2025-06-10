@@ -101,11 +101,22 @@ const PayrollPage: React.FC = () => {
   function getCallHour(rsaId: string, date: Date) {
     const dateKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     const assigned = assignments[dateKey] || [];
-    if (!assigned.includes(rsaId)) return '';
-    const dayName = date.getDay();
-    // 0: Sunday, 6: Saturday
-    if (dayName === 0 || dayName === 6) return '24';
-    return '16';
+    // Defensive: support both old (string[]) and new ([{id,shift}]) formats
+    if (assigned.length > 0 && typeof assigned[0] === 'object' && assigned[0] !== null && Object.prototype.hasOwnProperty.call(assigned[0], 'shift')) {
+      // New format: array of { id, shift }
+      const assignment = assigned.find((a: any) => String(a.id) === String(rsaId));
+      if (!assignment) return '';
+      if ((assignment as any).shift === 'F') return '24';
+      if ((assignment as any).shift === 'H') return '12';
+      return '';
+    } else {
+      // Old format: array of IDs (string[])
+      if (!assigned.includes(rsaId)) return '';
+      // Fallback: 24 for weekends, 16 for weekdays (legacy logic)
+      const dayName = date.getDay();
+      if (dayName === 0 || dayName === 6) return '24';
+      return '16';
+    }
   }
 
   // CSV Export helper
