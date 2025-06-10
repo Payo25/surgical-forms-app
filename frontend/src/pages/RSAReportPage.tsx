@@ -104,14 +104,15 @@ const PayrollPage: React.FC = () => {
     // Defensive: support both old (string[]) and new ([{id,shift}]) formats
     if (assigned.length > 0 && typeof assigned[0] === 'object' && assigned[0] !== null && Object.prototype.hasOwnProperty.call(assigned[0], 'shift')) {
       // New format: array of { id, shift }
-      const assignment = assigned.find((a: any) => String(a.id) === String(rsaId));
+      // Fix: compare as strings, and also compare against rsa.id, rsa.id as string, and possible number
+      const assignment = assigned.find((a: any) => String(a.id) === String(rsaId) || String(a.id) === String(Number(rsaId)));
       if (!assignment) return '';
       if ((assignment as any).shift === 'F') return '24';
       if ((assignment as any).shift === 'H') return '12';
       return '';
     } else {
       // Old format: array of IDs (string[])
-      if (!assigned.includes(rsaId)) return '';
+      if (!assigned.map((id: any) => String(id)).includes(String(rsaId))) return '';
       // Fallback: 24 for weekends, 16 for weekdays (legacy logic)
       const dayName = date.getDay();
       if (dayName === 0 || dayName === 6) return '24';
