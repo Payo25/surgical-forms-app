@@ -129,7 +129,7 @@ const CallHoursPage: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="responsive-card" style={{ maxWidth: 1100, width: '100%' }}>
+      <div className="responsive-card" style={{ maxWidth: 1300, width: '100%' }}>
         <button
           onClick={() => navigate('/dashboard')}
           style={{
@@ -218,26 +218,31 @@ const CallHoursPage: React.FC = () => {
                                 if (!rsa) return null;
                                 return (
                                   <li key={a.id} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                                    <span>{rsa.fullName || rsa.username}</span>
                                     <button
-                                      onClick={() => handleToggleShift(thisDay, a.id)}
+                                      onClick={userRole === 'Business Assistant' && !exportingPDF ? () => handleToggleShift(thisDay, a.id) : undefined}
                                       style={{
+                                        marginLeft: 6,
                                         marginRight: 6,
                                         color: '#185a9d',
                                         background: 'none',
                                         border: 'none',
-                                        cursor: 'pointer',
+                                        cursor: userRole === 'Business Assistant' && !exportingPDF ? 'pointer' : 'default',
                                         fontWeight: 700,
                                         fontSize: 16,
                                         width: 22,
                                         height: 22,
                                         padding: 0,
                                         lineHeight: 1,
+                                        pointerEvents: userRole === 'Business Assistant' && !exportingPDF ? 'auto' : 'none',
+                                        opacity: 1
                                       }}
                                       aria-label={`Toggle shift for ${rsa.fullName}`}
+                                      tabIndex={userRole === 'Business Assistant' && !exportingPDF ? 0 : -1}
+                                      disabled={!(userRole === 'Business Assistant' && !exportingPDF)}
                                     >
                                       {a.shift}
                                     </button>
-                                    <span>{rsa.fullName || rsa.username}</span>
                                     {userRole === 'Business Assistant' && !exportingPDF && (
                                       <button
                                         onClick={() => handleRemoveRSA(thisDay, a.id)}
