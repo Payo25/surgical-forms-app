@@ -121,14 +121,30 @@ app.post('/api/forms', upload.single('surgeryFormFile'), async (req, res) => {
 
 app.put('/api/forms/:id', async (req, res) => {
   try {
-    // Map camelCase to snake_case for DB
-    const snakeCase = str => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    const fields = Object.keys(req.body).map(snakeCase);
-    const values = Object.values(req.body);
+    // Explicit mapping from camelCase to DB columns
+    const fieldMap = {
+      patientName: 'patientname',
+      dob: 'dob',
+      insuranceCompany: 'insurancecompany',
+      healthCenterName: 'healthcentername',
+      date: 'date',
+      timeIn: 'timein',
+      timeOut: 'timeout',
+      doctorName: 'doctorname',
+      procedure: 'procedure',
+      caseType: 'casetype',
+      status: 'status',
+      createdBy: 'createdby',
+      surgeryFormFileUrl: 'surgeryformfileurl',
+      createdAt: 'createdat',
+      lastModified: 'lastmodified',
+    };
+    const fields = Object.keys(req.body).filter(k => fieldMap[k]);
+    const values = fields.map(k => req.body[k]);
     if (fields.length === 0) return res.status(400).json({ error: 'No fields to update' });
-    const setClause = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
+    const setClause = fields.map((k, i) => `${fieldMap[k]} = $${i + 1}`).join(', ');
     const result = await pool.query(
-      `UPDATE forms SET ${setClause}, lastModified = $${fields.length + 1} WHERE id = $${fields.length + 2} RETURNING *`,
+      `UPDATE forms SET ${setClause}, lastmodified = $${fields.length + 1} WHERE id = $${fields.length + 2} RETURNING *`,
       [...values, new Date().toISOString(), req.params.id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
