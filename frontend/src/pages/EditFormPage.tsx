@@ -170,15 +170,11 @@ const EditFormPage: React.FC = () => {
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Status</label>
-              <input type="text" name="status" value={form.status} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} />
+              <input type="text" name="status" value={form.status} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} disabled={userRole === 'Registered Surgical Assistant'} />
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Surgery Date</label>
               <input type="date" name="date" value={form.date} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} />
-            </div>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Upload Surgery Form Image</label>
-              <input type="file" id="surgeryFormFileInput" name="surgeryFormFile" accept="image/*" />
             </div>
             {form.surgeryFormFileUrl && (
               <div style={{ marginBottom: 16 }}>
