@@ -28,7 +28,8 @@ const CallHoursPage: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [assignments, setAssignments] = useState<{ [day: string]: string[] }>({});
+  // Change assignments to store array of objects: { id: string, shift: 'F' | 'H' }
+  const [assignments, setAssignments] = useState<{ [day: string]: { id: string, shift: 'F' | 'H' }[] }>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -62,17 +63,29 @@ const CallHoursPage: React.FC = () => {
     const dateKey = getDateString(year, month, day);
     setAssignments(prev => {
       const prevList = prev[dateKey] || [];
-      const rsaIdStr = String(rsaId); // Ensure string
-      if (prevList.includes(rsaIdStr)) return prev;
-      return { ...prev, [dateKey]: [...prevList, rsaIdStr] };
+      const rsaIdStr = String(rsaId);
+      if (prevList.some((a: any) => a.id === rsaIdStr)) return prev;
+      return { ...prev, [dateKey]: [...prevList, { id: rsaIdStr, shift: 'F' }] };
     });
   };
   const handleRemoveRSA = (day: number, rsaId: string) => {
     const dateKey = getDateString(year, month, day);
     setAssignments(prev => {
       const prevList = prev[dateKey] || [];
-      const rsaIdStr = String(rsaId); // Ensure string
-      return { ...prev, [dateKey]: prevList.filter(id => id !== rsaIdStr) };
+      const rsaIdStr = String(rsaId);
+      return { ...prev, [dateKey]: prevList.filter((a: any) => a.id !== rsaIdStr) };
+    });
+  };
+  const handleToggleShift = (day: number, rsaId: string) => {
+    const dateKey = getDateString(year, month, day);
+    setAssignments(prev => {
+      const prevList = prev[dateKey] || [];
+      return {
+        ...prev,
+        [dateKey]: prevList.map((a: any) =>
+          a.id === String(rsaId) ? { ...a, shift: a.shift === 'F' ? 'H' : 'F' } : a
+        ),
+      };
     });
   };
 
@@ -178,7 +191,7 @@ const CallHoursPage: React.FC = () => {
               <thead>
                 <tr style={{ background: '#f6f8fa' }}>
                   {[...Array(7)].map((_, i) => (
-                    <th key={i} style={{ padding: 8, borderBottom: '1px solid #e2e8f0' }}>{['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][i]}</th>
+                    <th key={i} style={{ padding: 8, borderBottom: '1px solid #e2e8f0', width: 78 }}>{['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][i]}</th>
                   ))}
                 </tr>
               </thead>
@@ -200,14 +213,47 @@ const CallHoursPage: React.FC = () => {
                           <td key={d} style={{ padding: 8, minHeight: 80, border: '1px solid #e2e8f0', verticalAlign: 'top' }}>
                             <div style={{ fontWeight: 600, marginBottom: 4 }}>{thisDay}</div>
                             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                              {assigned.map(rsaId => {
-                                const rsa = users.find(u => String(u.id) === String(rsaId));
+                              {(assignments[dateKey] || []).map((a: any) => {
+                                const rsa = users.find(u => String(u.id) === String(a.id));
                                 if (!rsa) return null;
                                 return (
-                                  <li key={rsaId} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                                  <li key={a.id} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                                    <button
+                                      onClick={() => handleToggleShift(thisDay, a.id)}
+                                      style={{
+                                        marginRight: 6,
+                                        color: '#185a9d',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        fontWeight: 700,
+                                        fontSize: 16,
+                                        width: 22,
+                                        height: 22,
+                                        padding: 0,
+                                        lineHeight: 1,
+                                      }}
+                                      aria-label={`Toggle shift for ${rsa.fullName}`}
+                                    >
+                                      {a.shift}
+                                    </button>
                                     <span>{rsa.fullName || rsa.username}</span>
                                     {userRole === 'Business Assistant' && !exportingPDF && (
-                                      <button onClick={() => handleRemoveRSA(thisDay, rsaId)} style={{ marginLeft: 6, color: '#e74c3c', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 16 }} aria-label={`Remove ${rsa.fullName}`}>×</button>
+                                      <button
+                                        onClick={() => handleRemoveRSA(thisDay, a.id)}
+                                        style={{
+                                          marginLeft: 6,
+                                          color: '#e74c3c',
+                                          background: 'none',
+                                          border: 'none',
+                                          cursor: 'pointer',
+                                          fontWeight: 700,
+                                          fontSize: 16,
+                                        }}
+                                        aria-label={`Remove ${rsa.fullName}`}
+                                      >
+                                        ×
+                                      </button>
                                     )}
                                   </li>
                                 );
@@ -221,7 +267,7 @@ const CallHoursPage: React.FC = () => {
                                 style={{ width: '100%', marginTop: 4 }}
                               >
                                 <option value="">+ Add RSA</option>
-                                {users.filter(u => !(assignments[dateKey] || []).includes(u.id)).map(u => (
+                                {users.filter(u => !((assignments[dateKey] || []).some((a: any) => a.id === u.id))).map(u => (
                                   <option key={u.id} value={u.id}>{u.fullName || u.username}</option>
                                 ))}
                               </select>
