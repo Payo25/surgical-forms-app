@@ -300,6 +300,24 @@ const CallHoursPage: React.FC = () => {
         )}
         {success && <div style={{ color: '#43cea2', marginTop: 12 }}>{success}</div>}
         {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
+        {/* Shift type legend */}
+        <div style={{
+          marginTop: 32,
+          padding: '12px 0 0 0',
+          borderTop: '1px solid #e2e8f0',
+          fontSize: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12
+        }}>
+          <span style={{ fontWeight: 600 }}>Shift type:</span>
+          <span>
+            <span style={{ color: '#185a9d', fontWeight: 700, fontSize: 16 }}>F</span>ull shift (24 hours),
+            <span style={{ marginLeft: 16 }}>
+              <span style={{ color: '#185a9d', fontWeight: 700, fontSize: 16 }}>H</span>alf shift (12 hours)
+            </span>
+          </span>
+        </div>
       </div>
     </div>
   );
