@@ -16,10 +16,10 @@ const FormsListPage: React.FC = () => {
     fetch(API_URL)
       .then(res => res.json())
       .then(data => {
-        const user = localStorage.getItem('user');
+        const userId = localStorage.getItem('userId');
         let filtered = data;
         if (userRole === 'Registered Surgical Assistant') {
-          filtered = data.filter((form: any) => form.createdBy === user);
+          filtered = data.filter((form: any) => form.createdByUserId === userId);
         }
         setForms(filtered);
         setLoading(false);
