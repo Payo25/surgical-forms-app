@@ -138,7 +138,6 @@ app.put('/api/forms/:id', upload.single('surgeryFormFile'), async (req, res) => 
       createdBy: 'createdby',
       surgeryFormFileUrl: 'surgeryformfileurl',
       createdAt: 'createdat',
-      lastModified: 'lastmodified',
     };
     // Use req.body for text fields, req.file for file
     const fields = Object.keys(req.body).filter(k => fieldMap[k]);
