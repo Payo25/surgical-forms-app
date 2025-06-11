@@ -111,7 +111,8 @@ const ViewFormPage: React.FC = () => {
             <p><b>Procedure:</b> {form.procedure}</p>
             <p><b>Case Type:</b> {form.caseType}</p>
             <p><b>Status:</b> {form.status}</p>
-            <p><b>Created By:</b> {form.createdBy}</p>
+            <p><b>Created By:</b> {form.createdByFullName || form.createdBy}</p>
+            <p><b>Created By Email:</b> {form.createdByEmail || ''}</p>
             <p style={{ color: '#888', fontSize: 13 }}><b>Created At:</b> {form.createdAt ? new Date(form.createdAt).toLocaleString() : ''}</p>
             {form.lastModified && <p style={{ color: '#888', fontSize: 13 }}><b>Last Modified:</b> {new Date(form.lastModified).toLocaleString()}</p>}
             {form.surgeryFormFileUrl && (

@@ -43,7 +43,7 @@ const upload = multer({ storage: storage });
 app.get('/api/forms', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT forms.*, users.fullname AS createdbyfullname, users.email AS createdbyemail
+      SELECT forms.*, users.fullname AS createdbyfullname, users.username AS createdbyemail
       FROM forms
       LEFT JOIN users ON forms.createdbyuserid = users.id
       ORDER BY forms.id DESC
@@ -79,7 +79,7 @@ app.get('/api/forms', async (req, res) => {
 app.get('/api/forms/:id', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT forms.*, users.fullname AS createdbyfullname, users.email AS createdbyemail
+      SELECT forms.*, users.fullname AS createdbyfullname, users.username AS createdbyemail
       FROM forms
       LEFT JOIN users ON forms.createdbyuserid = users.id
       WHERE forms.id = $1
@@ -118,16 +118,17 @@ app.get('/api/forms/:id', async (req, res) => {
 app.post('/api/forms', upload.single('surgeryFormFile'), async (req, res) => {
   const {
     patientName, dob, insuranceCompany,
-    healthCenterName, timeIn, timeOut, doctorName, procedure, caseType, status, createdBy, date
+    healthCenterName, timeIn, timeOut, doctorName, procedure, caseType, status, createdByUserId, date
   } = req.body;
-  if (!patientName || !dob || !insuranceCompany || !healthCenterName || !date || !doctorName || !procedure || !caseType || !status || !createdBy || !req.file || (caseType !== 'Cancelled' && (!timeIn || !timeOut))) {
+  // Validate required fields
+  if (!patientName || !dob || !insuranceCompany || !healthCenterName || !date || !doctorName || !procedure || !caseType || !status || !createdByUserId || !req.file || (caseType !== 'Cancelled' && (!timeIn || !timeOut))) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
   try {
     const result = await pool.query(
-      `INSERT INTO forms (patientName, dob, insuranceCompany, healthCenterName, date, timeIn, timeOut, doctorName, procedure, caseType, status, createdBy, surgeryFormFileUrl, createdAt)
+      `INSERT INTO forms (patientName, dob, insuranceCompany, healthCenterName, date, timeIn, timeOut, doctorName, procedure, caseType, status, createdByUserId, surgeryFormFileUrl, createdAt)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
-      [patientName, dob, insuranceCompany, healthCenterName, date, timeIn, timeOut, doctorName, procedure, caseType, status, createdBy, `/uploads/${req.file.filename}`, new Date().toISOString()]
+      [patientName, dob, insuranceCompany, healthCenterName, date, timeIn, timeOut, doctorName, procedure, caseType, status, createdByUserId, `/uploads/${req.file.filename}`, new Date().toISOString()]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -173,11 +174,6 @@ app.put('/api/forms/:id', upload.single('surgeryFormFile'), async (req, res) => 
     // id param
     paramCount++;
     values.push(req.params.id);
-
-    /* DEBUG: Log the query for debugging */
-    const sqlQuery = `UPDATE forms SET ${setClause} WHERE id = $${paramCount} RETURNING *`;
-    console.log('SQL Query:', sqlQuery);
-    console.log('Values:', values);
 
     const result = await pool.query(
       `UPDATE forms SET ${setClause} WHERE id = $${paramCount} RETURNING *`,

@@ -12,6 +12,9 @@ export interface SurgicalForm {
   caseType: string;
   status: string;
   createdBy: string;
+  createdByUserId?: string;
+  createdByFullName?: string;
+  createdByEmail?: string;
   createdAt?: string;
   lastModified?: string;
   surgeryFormFileUrl?: string;

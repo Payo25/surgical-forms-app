@@ -23,6 +23,7 @@ const LoginPage: React.FC = () => {
       const user = await res.json();
       localStorage.setItem('user', user.username);
       localStorage.setItem('role', user.role);
+      localStorage.setItem('userId', user.id); // Store userId for form creation
       // Audit log login
       await fetch(AUDIT_LOGIN_URL, {
         method: 'POST',

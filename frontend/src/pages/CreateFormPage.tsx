@@ -61,7 +61,13 @@ const CreateFormPage: React.FC = () => {
     formData.append('procedure', procedure);
     formData.append('caseType', caseType);
     formData.append('status', 'pending');
-    formData.append('createdBy', localStorage.getItem('user') || '');
+    // Use user ID for dynamic linking
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      setError('User ID not found in localStorage. Please log in again.');
+      return;
+    }
+    formData.append('createdByUserId', userId);
     formData.append('surgeryFormFile', surgeryFormFile);
 
     try {

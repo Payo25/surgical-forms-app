@@ -186,6 +186,8 @@ const EditFormPage: React.FC = () => {
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Update Surgery Form Image</label>
               <input type="file" accept="image/*" onChange={e => setSelectedFile(e.target.files ? e.target.files[0] : null)} />
             </div>
+            <p style={{ color: '#888', fontSize: 13 }}><b>Created By:</b> {form.createdByFullName || form.createdBy}</p>
+            <p style={{ color: '#888', fontSize: 13 }}><b>Created By Email:</b> {form.createdByEmail || ''}</p>
             {error && <div style={{ color: '#e74c3c', marginBottom: 12, textAlign: 'center' }}>{error}</div>}
             {success && <div style={{ color: '#43cea2', marginBottom: 12, textAlign: 'center' }}>{success}</div>}
             <button type="submit"
