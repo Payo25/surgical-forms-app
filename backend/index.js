@@ -42,7 +42,12 @@ const upload = multer({ storage: storage });
 // --- Forms API using PostgreSQL ---
 app.get('/api/forms', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM forms ORDER BY id DESC');
+    const result = await pool.query(`
+      SELECT forms.*, users.fullname AS createdbyfullname, users.email AS createdbyemail
+      FROM forms
+      LEFT JOIN users ON forms.createdbyuserid = users.id
+      ORDER BY forms.id DESC
+    `);
     // Map DB fields to camelCase for frontend compatibility
     const forms = result.rows.map(form => ({
       id: form.id,
@@ -57,7 +62,10 @@ app.get('/api/forms', async (req, res) => {
       procedure: form.procedure,
       caseType: form.casetype,
       status: form.status,
-      createdBy: form.createdby,
+      createdBy: form.createdby, // legacy
+      createdByUserId: form.createdbyuserid,
+      createdByFullName: form.createdbyfullname,
+      createdByEmail: form.createdbyemail,
       surgeryFormFileUrl: form.surgeryformfileurl,
       createdAt: form.createdat,
       lastModified: form.lastmodified,
@@ -70,7 +78,12 @@ app.get('/api/forms', async (req, res) => {
 
 app.get('/api/forms/:id', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM forms WHERE id = $1', [req.params.id]);
+    const result = await pool.query(`
+      SELECT forms.*, users.fullname AS createdbyfullname, users.email AS createdbyemail
+      FROM forms
+      LEFT JOIN users ON forms.createdbyuserid = users.id
+      WHERE forms.id = $1
+    `, [req.params.id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
     const form = result.rows[0];
     // Format dates for HTML input compatibility
@@ -88,7 +101,10 @@ app.get('/api/forms/:id', async (req, res) => {
       procedure: form.procedure,
       caseType: form.casetype,
       status: form.status,
-      createdBy: form.createdby,
+      createdBy: form.createdby, // legacy
+      createdByUserId: form.createdbyuserid,
+      createdByFullName: form.createdbyfullname,
+      createdByEmail: form.createdbyemail,
       surgeryFormFileUrl: form.surgeryformfileurl,
       createdAt: form.createdat,
       lastModified: form.lastmodified,
@@ -104,7 +120,7 @@ app.post('/api/forms', upload.single('surgeryFormFile'), async (req, res) => {
     patientName, dob, insuranceCompany,
     healthCenterName, timeIn, timeOut, doctorName, procedure, caseType, status, createdBy, date
   } = req.body;
-  if (!patientName || !dob || !insuranceCompany || !healthCenterName || !timeIn || !timeOut || !doctorName || !procedure || !caseType || !req.file) {
+  if (!patientName || !dob || !insuranceCompany || !healthCenterName || !date || !doctorName || !procedure || !caseType || !status || !createdBy || !req.file || (caseType !== 'Cancelled' && (!timeIn || !timeOut))) {
     return res.status(400).json({ error: 'All fields are required.' });
   }
   try {

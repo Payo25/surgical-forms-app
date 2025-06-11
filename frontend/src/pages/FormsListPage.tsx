@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = '/api';
 const API_URL = `${API_BASE_URL}/forms`;
-const USERS_API_URL = `${API_BASE_URL}/users`;
 
 const FormsListPage: React.FC = () => {
   const [forms, setForms] = useState<any[]>([]);
@@ -14,33 +13,19 @@ const FormsListPage: React.FC = () => {
   const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
-    // Fetch users first
-    fetch(USERS_API_URL)
+    fetch(API_URL)
       .then(res => res.json())
-      .then(usersData => {
-        fetch(API_URL)
-          .then(res => res.json())
-          .then(data => {
-            const user = localStorage.getItem('user');
-            let filtered = data;
-            if (userRole === 'Registered Surgical Assistant') {
-              filtered = data.filter((form: any) => form.createdBy === user);
-            }
-            // Attach full name of creator if possible
-            const formsWithFullName = filtered.map((form: any) => {
-              const creator = usersData.find((u: any) => u.username === form.createdBy);
-              return { ...form, createdByFullName: creator ? creator.fullName : form.createdBy };
-            });
-            setForms(formsWithFullName);
-            setLoading(false);
-          })
-          .catch(() => {
-            setError('Failed to load forms.');
-            setLoading(false);
-          });
+      .then(data => {
+        const user = localStorage.getItem('user');
+        let filtered = data;
+        if (userRole === 'Registered Surgical Assistant') {
+          filtered = data.filter((form: any) => form.createdBy === user);
+        }
+        setForms(filtered);
+        setLoading(false);
       })
       .catch(() => {
-        setError('Failed to load users.');
+        setError('Failed to load forms.');
         setLoading(false);
       });
   }, [userRole]);
