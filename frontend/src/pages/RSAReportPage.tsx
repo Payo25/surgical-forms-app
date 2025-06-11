@@ -127,12 +127,12 @@ const PayrollPage: React.FC = () => {
   // CSV Export helper
   const handleDownloadCSV = () => {
     if (!fromDate || !toDate) return;
-    let csv = 'RSA,Date,Day,Call Hour,Shift<3,Shift>3,Voluntary\n';
+    let csv = 'RSA,Date,Day,Call Hour,Shift<3,Shift>3,Voluntary,Cancelled\n';
     users.forEach(rsa => {
       const from = parseDate(fromDate);
       const to = parseDate(toDate);
       const dateRange = getDatesInRange(from, to);
-      let totalCallHour = 0, totalShiftLT3 = 0, totalShiftGT3 = 0, totalVoluntary = 0;
+      let totalCallHour = 0, totalShiftLT3 = 0, totalShiftGT3 = 0, totalVoluntary = 0, totalCancelled = 0;
       dateRange.forEach(date => {
         const dayName = getDayName(date);
         const callHour = getCallHour(rsa.id, date);
@@ -144,23 +144,26 @@ const PayrollPage: React.FC = () => {
         const shiftLT3 = dayForms.filter(f => f.caseType === 'Shift<3').length;
         const shiftGT3 = dayForms.filter(f => f.caseType === 'Shift>3').length;
         const voluntary = dayForms.filter(f => f.caseType === 'Voluntary').length;
+        const cancelled = dayForms.filter(f => f.caseType === 'Cancelled').length;
         totalCallHour += callHour ? parseInt(callHour) : 0;
         totalShiftLT3 += shiftLT3;
         totalShiftGT3 += shiftGT3;
         totalVoluntary += voluntary;
-        csv += `"${rsa.fullName || rsa.username}",${date.toLocaleDateString()},${dayName},${callHour},${shiftLT3},${shiftGT3},${voluntary}\n`;
+        totalCancelled += cancelled;
+        csv += `"${rsa.fullName || rsa.username}",${date.toLocaleDateString()},${dayName},${callHour},${shiftLT3},${shiftGT3},${voluntary},${cancelled}\n`;
       });
       // Add totals row for this RSA
-      csv += `"${rsa.fullName || rsa.username}",Total,,${totalCallHour},${totalShiftLT3},${totalShiftGT3},${totalVoluntary}\n`;
+      csv += `"${rsa.fullName || rsa.username}",Total,,${totalCallHour},${totalShiftLT3},${totalShiftGT3},${totalVoluntary},${totalCancelled}\n`;
       // Add payment row for this RSA
       const callHourPay = totalCallHour * 3;
       const shiftLT3Pay = totalShiftLT3 * 100;
       const shiftGT3Pay = totalShiftGT3 * 150;
       const voluntaryPay = totalVoluntary * 150;
-      csv += `"${rsa.fullName || rsa.username}",Amount to Pay,,$${callHourPay},$${shiftLT3Pay},$${shiftGT3Pay},$${voluntaryPay}\n`;
+      const cancelledPay = totalCancelled * 50;
+      csv += `"${rsa.fullName || rsa.username}",Amount to Pay,,$${callHourPay},$${shiftLT3Pay},$${shiftGT3Pay},$${voluntaryPay},$${cancelledPay}\n`;
       // Add total payable row for this RSA
-      const totalPay = callHourPay + shiftLT3Pay + shiftGT3Pay + voluntaryPay;
-      csv += `"${rsa.fullName || rsa.username}",Total Payable,,,,,$${totalPay}\n`;
+      const totalPay = callHourPay + shiftLT3Pay + shiftGT3Pay + voluntaryPay + cancelledPay;
+      csv += `"${rsa.fullName || rsa.username}",Total Payable,,,,,,$${totalPay}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, `payroll-report-${fromDate}-to-${toDate}.csv`);
@@ -210,19 +213,22 @@ const PayrollPage: React.FC = () => {
           const shiftLT3 = dayForms.filter(f => f.caseType === 'Shift<3').length;
           const shiftGT3 = dayForms.filter(f => f.caseType === 'Shift>3').length;
           const voluntary = dayForms.filter(f => f.caseType === 'Voluntary').length;
-          return { date, dayName, callHour, shiftLT3, shiftGT3, voluntary, debugForms: dayForms };
+          const cancelled = dayForms.filter(f => f.caseType === 'Cancelled').length;
+          return { date, dayName, callHour, shiftLT3, shiftGT3, voluntary, cancelled, debugForms: dayForms };
         });
         // Totals for the full range
         const totalCallHour = rows.reduce((sum, r) => sum + (r.callHour ? parseInt(r.callHour) : 0), 0);
         const totalShiftLT3 = rows.reduce((sum, r) => sum + r.shiftLT3, 0);
         const totalShiftGT3 = rows.reduce((sum, r) => sum + r.shiftGT3, 0);
         const totalVoluntary = rows.reduce((sum, r) => sum + r.voluntary, 0);
+        const totalCancelled = rows.reduce((sum, r) => sum + r.cancelled, 0);
         // Payment calculations
         const callHourPay = totalCallHour * 3;
         const shiftLT3Pay = totalShiftLT3 * 100;
         const shiftGT3Pay = totalShiftGT3 * 150;
         const voluntaryPay = totalVoluntary * 150;
-        const totalPay = callHourPay + shiftLT3Pay + shiftGT3Pay + voluntaryPay;
+        const cancelledPay = totalCancelled * 50;
+        const totalPay = callHourPay + shiftLT3Pay + shiftGT3Pay + voluntaryPay + cancelledPay;
         return (
           <div key={rsa.id} style={{ marginBottom: 48 }}>
             <h3 style={{ marginBottom: 8 }}>{rsa.fullName || rsa.username}</h3>
@@ -238,6 +244,7 @@ const PayrollPage: React.FC = () => {
                   <th style={{ padding: 8, border: '1px solid #e2e8f0' }}>Shift&lt;3</th>
                   <th style={{ padding: 8, border: '1px solid #e2e8f0' }}>Shift&gt;3</th>
                   <th style={{ padding: 8, border: '1px solid #e2e8f0' }}>Voluntary</th>
+                  <th style={{ padding: 8, border: '1px solid #e2e8f0' }}>Cancelled</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,6 +256,7 @@ const PayrollPage: React.FC = () => {
                     <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{row.shiftLT3}</td>
                     <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{row.shiftGT3}</td>
                     <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{row.voluntary}</td>
+                    <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{row.cancelled}</td>
                   </tr>
                 ))}
                 {/* Totals row for the full range */}
@@ -258,6 +266,7 @@ const PayrollPage: React.FC = () => {
                   <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{totalShiftLT3}</td>
                   <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{totalShiftGT3}</td>
                   <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{totalVoluntary}</td>
+                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{totalCancelled}</td>
                 </tr>
                 {/* Payment row for the full range */}
                 <tr style={{ fontWeight: 600, background: '#d1fae5' }}>
@@ -266,10 +275,11 @@ const PayrollPage: React.FC = () => {
                   <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${shiftLT3Pay}</td>
                   <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${shiftGT3Pay}</td>
                   <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${voluntaryPay}</td>
+                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${cancelledPay}</td>
                 </tr>
                 <tr style={{ fontWeight: 700, background: '#bbf7d0' }}>
                   <td colSpan={2} style={{ padding: 8, border: '1px solid #e2e8f0' }}>Total Payable</td>
-                  <td colSpan={4} style={{ padding: 8, border: '1px solid #e2e8f0' }}>${totalPay}</td>
+                  <td colSpan={5} style={{ padding: 8, border: '1px solid #e2e8f0' }}>${totalPay}</td>
                 </tr>
               </tbody>
             </table>

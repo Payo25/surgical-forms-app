@@ -163,7 +163,41 @@ const FormsListPage: React.FC = () => {
                   <td style={{ padding: 8 }}>{form.caseType}</td>
                   <td style={{ padding: 8 }}>{form.createdByFullName || form.createdBy}</td>
                   <td style={{ padding: 8 }}>{form.date ? new Date(form.date).toLocaleDateString() : ''}</td>
-                  <td style={{ padding: 8 }}>{form.status}</td>
+                  <td style={{ padding: 8 }}>
+                    {userRole === 'Business Assistant' ? (
+                      <button
+                        onClick={async () => {
+                          const newStatus = form.status === 'processed' ? 'pending' : 'processed';
+                          await fetch(`${API_URL}/${form.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: newStatus })
+                          });
+                          setForms(forms => forms.map(f => f.id === form.id ? { ...f, status: newStatus } : f));
+                        }}
+                        style={{
+                          padding: '6px 16px',
+                          borderRadius: 6,
+                          background: form.status === 'processed'
+                            ? 'linear-gradient(90deg, #bfc9d9 0%, #888 100%)'
+                            : 'linear-gradient(90deg, #e74c3c 0%, #e67e22 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          fontWeight: 600,
+                          fontSize: 14,
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 8px rgba(231,76,60,0.08)',
+                          transition: 'background 0.2s',
+                        }}
+                        tabIndex={0}
+                        aria-label={`Toggle status for ${form.patientName}`}
+                      >
+                        {form.status === 'processed' ? 'Processed' : 'Pending'}
+                      </button>
+                    ) : (
+                      form.status
+                    )}
+                  </td>
                   <td style={{ padding: 8 }}>
                     <button
                       onClick={() => navigate(`/forms/${form.id}`)}
@@ -239,38 +273,6 @@ const FormsListPage: React.FC = () => {
                         aria-label={`Delete form for ${form.patientName}`}
                       >
                         ❌
-                      </button>
-                    )}
-                    {userRole === 'Business Assistant' && (
-                      <button
-                        onClick={async () => {
-                          const newStatus = form.status === 'processed' ? 'pending' : 'processed';
-                          await fetch(`${API_URL}/${form.id}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ status: newStatus })
-                          });
-                          setForms(forms => forms.map(f => f.id === form.id ? { ...f, status: newStatus } : f));
-                        }}
-                        style={{
-                          padding: '6px 16px',
-                          borderRadius: 6,
-                          background: form.status === 'processed'
-                            ? 'linear-gradient(90deg, #bfc9d9 0%, #888 100%)'
-                            : 'linear-gradient(90deg, #e74c3c 0%, #e67e22 100%)',
-                          color: '#fff',
-                          border: 'none',
-                          fontWeight: 600,
-                          fontSize: 14,
-                          cursor: 'pointer',
-                          boxShadow: '0 2px 8px rgba(231,76,60,0.08)',
-                          transition: 'background 0.2s',
-                          marginRight: 8
-                        }}
-                        tabIndex={0}
-                        aria-label={`Toggle status for ${form.patientName}`}
-                      >
-                        {form.status === 'processed' ? 'Mark Pending' : 'Mark Processed'}
                       </button>
                     )}
                   </td>

@@ -9,7 +9,8 @@ const caseTypeOptions = [
   "Regular",
   "Shift<3",
   "Shift>3",
-  "Voluntary"
+  "Voluntary",
+  "Cancelled"
 ];
 
 const CreateFormPage: React.FC = () => {
@@ -39,7 +40,9 @@ const CreateFormPage: React.FC = () => {
       !patientName || !dob || !insuranceCompany ||
       !healthCenterName ||
       !date ||
-      !timeIn || !timeOut || !doctorName || !procedure || !caseType || !surgeryFormFile
+      (!timeIn && caseType !== 'Cancelled') ||
+      (!timeOut && caseType !== 'Cancelled') ||
+      !doctorName || !procedure || !caseType || !surgeryFormFile
     ) {
       setError('All fields are required.');
       return;
@@ -187,8 +190,9 @@ const CreateFormPage: React.FC = () => {
               type="time"
               value={timeIn}
               onChange={e => setTimeIn(e.target.value)}
-              required
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
+              required={caseType !== 'Cancelled'}
+              disabled={caseType === 'Cancelled'}
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box', background: caseType === 'Cancelled' ? '#f6f8fa' : '#fff' }}
             />
           </div>
           <div style={{ marginBottom: 16 }}>
@@ -197,8 +201,9 @@ const CreateFormPage: React.FC = () => {
               type="time"
               value={timeOut}
               onChange={e => setTimeOut(e.target.value)}
-              required
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
+              required={caseType !== 'Cancelled'}
+              disabled={caseType === 'Cancelled'}
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box', background: caseType === 'Cancelled' ? '#f6f8fa' : '#fff' }}
             />
           </div>
           <div style={{ marginBottom: 16 }}>
