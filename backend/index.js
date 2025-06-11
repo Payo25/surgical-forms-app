@@ -158,6 +158,12 @@ app.put('/api/forms/:id', upload.single('surgeryFormFile'), async (req, res) => 
     // id param
     paramCount++;
     values.push(req.params.id);
+
+    /* DEBUG: Log the query for debugging */
+    const sqlQuery = `UPDATE forms SET ${setClause} WHERE id = $${paramCount} RETURNING *`;
+    console.log('SQL Query:', sqlQuery);
+    console.log('Values:', values);
+
     const result = await pool.query(
       `UPDATE forms SET ${setClause} WHERE id = $${paramCount} RETURNING *`,
       values

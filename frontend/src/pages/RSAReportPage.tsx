@@ -157,10 +157,10 @@ const PayrollPage: React.FC = () => {
       const shiftLT3Pay = totalShiftLT3 * 100;
       const shiftGT3Pay = totalShiftGT3 * 150;
       const voluntaryPay = totalVoluntary * 150;
-      csv += `"${rsa.fullName || rsa.username}",Amount to Pay,,${callHourPay},${shiftLT3Pay},${shiftGT3Pay},${voluntaryPay}\n`;
+      csv += `"${rsa.fullName || rsa.username}",Amount to Pay,,$${callHourPay},$${shiftLT3Pay},$${shiftGT3Pay},$${voluntaryPay}\n`;
       // Add total payable row for this RSA
       const totalPay = callHourPay + shiftLT3Pay + shiftGT3Pay + voluntaryPay;
-      csv += `"${rsa.fullName || rsa.username}",Total Payable,,,,,${totalPay}\n`;
+      csv += `"${rsa.fullName || rsa.username}",Total Payable,,,,,$${totalPay}\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, `payroll-report-${fromDate}-to-${toDate}.csv`);
@@ -262,14 +262,14 @@ const PayrollPage: React.FC = () => {
                 {/* Payment row for the full range */}
                 <tr style={{ fontWeight: 600, background: '#d1fae5' }}>
                   <td colSpan={2} style={{ padding: 8, border: '1px solid #e2e8f0' }}>Amount to Pay</td>
-                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{callHourPay}</td>
-                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{shiftLT3Pay}</td>
-                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{shiftGT3Pay}</td>
-                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>{voluntaryPay}</td>
+                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${callHourPay}</td>
+                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${shiftLT3Pay}</td>
+                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${shiftGT3Pay}</td>
+                  <td style={{ padding: 8, border: '1px solid #e2e8f0' }}>${voluntaryPay}</td>
                 </tr>
                 <tr style={{ fontWeight: 700, background: '#bbf7d0' }}>
                   <td colSpan={2} style={{ padding: 8, border: '1px solid #e2e8f0' }}>Total Payable</td>
-                  <td colSpan={4} style={{ padding: 8, border: '1px solid #e2e8f0' }}>{totalPay}</td>
+                  <td colSpan={4} style={{ padding: 8, border: '1px solid #e2e8f0' }}>${totalPay}</td>
                 </tr>
               </tbody>
             </table>
