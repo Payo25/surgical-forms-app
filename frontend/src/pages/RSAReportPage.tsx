@@ -206,10 +206,10 @@ const PayrollPage: React.FC = () => {
           const d = date.getDate();
           const m = date.getMonth() + 1;
           const y = date.getFullYear();
-          // Compare by email (createdBy === rsa.email)
+          // Compare by ID (createdById === rsa.id)
           // Fallback: Try to get email from user object, or use username if email is missing
           const rsaId = rsa.id;
-          const dayForms = forms.filter(f => f.createdBy === parseInt(rsaId) && f.date && new Date(f.date).getFullYear() === y && new Date(f.date).getMonth() + 1 === m && new Date(f.date).getDate() === d);
+          const dayForms = forms.filter(f => f.createdById === parseInt(rsaId) && f.date && new Date(f.date).getFullYear() === y && new Date(f.date).getMonth() + 1 === m && new Date(f.date).getDate() === d);
           const shiftLT3 = dayForms.filter(f => f.caseType === 'Shift<3').length;
           const shiftGT3 = dayForms.filter(f => f.caseType === 'Shift>3').length;
           const voluntary = dayForms.filter(f => f.caseType === 'Voluntary').length;
