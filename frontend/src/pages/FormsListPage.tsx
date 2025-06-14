@@ -192,6 +192,7 @@ const FormsListPage: React.FC = () => {
                       )}
                     </td>
                     <td style={{ padding: 8 }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                       <button
                         onClick={() => navigate(`/forms/${form.id}`)}
                         style={{
@@ -268,6 +269,7 @@ const FormsListPage: React.FC = () => {
                           ❌
                         </button>
                       )}
+                      </div>
                     </td>
                   </tr>
                 ))}

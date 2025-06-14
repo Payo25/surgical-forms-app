@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = '/api';
@@ -27,10 +27,18 @@ const CreateFormPage: React.FC = () => {
   const [surgeryFormFile, setSurgeryFormFile] = useState<File | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [healthCenters, setHealthCenters] = useState<any[]>([]);
   const navigate = useNavigate();
 
   // Get user role from localStorage (simulate for now)
   const userRole = localStorage.getItem('role') || 'Registered Surgical Assistant';
+
+  useEffect(() => {
+    fetch('/api/health-centers')
+      .then(res => res.json())
+      .then(setHealthCenters)
+      .catch(() => setHealthCenters([]));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,13 +180,17 @@ const CreateFormPage: React.FC = () => {
           </div>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Health Center Name</label>
-            <input
-              type="text"
+            <select
               value={healthCenterName}
               onChange={e => setHealthCenterName(e.target.value)}
               required
               style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
-            />
+            >
+              <option value="">Select Health Center</option>
+              {healthCenters.map((hc: any) => (
+                <option key={hc.id} value={hc.name}>{hc.name}</option>
+              ))}
+            </select>
           </div>
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Surgery Date</label>

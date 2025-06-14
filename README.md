@@ -91,6 +91,14 @@ npm install
     year INTEGER NOT NULL,
     assignments JSONB NOT NULL
   );
+
+  CREATE TABLE health_centers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    address VARCHAR(255),
+    phone VARCHAR(50),
+    contact_person VARCHAR(255)
+);
   ```
 
 ### 3. Setup the Frontend

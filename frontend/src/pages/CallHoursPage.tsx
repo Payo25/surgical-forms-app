@@ -216,33 +216,31 @@ const CallHoursPage: React.FC = () => {
                               {(assignments[dateKey] || []).map((a: any) => {
                                 const rsa = users.find(u => String(u.id) === String(a.id));
                                 if (!rsa) return null;
+                                const isFull = a.shift === 'F';
                                 return (
                                   <li key={a.id} style={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-                                    <span>{rsa.fullName || rsa.username}</span>
-                                    <button
+                                    <span
                                       onClick={userRole === 'Business Assistant' && !exportingPDF ? () => handleToggleShift(thisDay, a.id) : undefined}
                                       style={{
-                                        marginLeft: 6,
-                                        marginRight: 6,
-                                        color: '#185a9d',
-                                        background: 'none',
-                                        border: 'none',
                                         cursor: userRole === 'Business Assistant' && !exportingPDF ? 'pointer' : 'default',
                                         fontWeight: 700,
                                         fontSize: 16,
-                                        width: 22,
-                                        height: 22,
-                                        padding: 0,
-                                        lineHeight: 1,
-                                        pointerEvents: userRole === 'Business Assistant' && !exportingPDF ? 'auto' : 'none',
-                                        opacity: 1
+                                        color: isFull ? '#185a9d' : '#05a117', // blue for Full, green for Half
+                                        background: userRole === 'Business Assistant' && !exportingPDF ? 'rgba(24,90,157,0.07)' : 'none',
+                                        borderRadius: 4,
+                                        padding: '2px 6px',
+                                        marginRight: 8,
+                                        transition: 'color 0.2s, background 0.2s',
+                                        userSelect: 'none',
                                       }}
                                       aria-label={`Toggle shift for ${rsa.fullName}`}
                                       tabIndex={userRole === 'Business Assistant' && !exportingPDF ? 0 : -1}
-                                      disabled={!(userRole === 'Business Assistant' && !exportingPDF)}
                                     >
-                                      {a.shift}
-                                    </button>
+                                      {rsa.fullName || rsa.username}
+                                      <span style={{ marginLeft: 6, fontWeight: 700, fontSize: 15 }}>
+                                        ({a.shift})
+                                      </span>
+                                    </span>
                                     {userRole === 'Business Assistant' && !exportingPDF && (
                                       <button
                                         onClick={() => handleRemoveRSA(thisDay, a.id)}
@@ -312,9 +310,9 @@ const CallHoursPage: React.FC = () => {
         }}>
           <span style={{ fontWeight: 600 }}>Shift type:</span>
           <span>
-            <span style={{ color: '#185a9d', fontWeight: 700, fontSize: 16 }}>F</span>ull shift (24 hours),
+            <span style={{ color: '#185a9d', fontWeight: 700, fontSize: 16 }}>Full</span> (24 hours on weekends, and 16 hours on weekdays),
             <span style={{ marginLeft: 16 }}>
-              <span style={{ color: '#185a9d', fontWeight: 700, fontSize: 16 }}>H</span>alf shift (12 hours)
+              <span style={{ color: '#05a117', fontWeight: 700, fontSize: 16 }}>Half</span> (12 hours on weekends, and 8 hours on weekdays).
             </span>
           </span>
         </div>

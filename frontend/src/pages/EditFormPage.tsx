@@ -13,6 +13,7 @@ const EditFormPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [healthCenters, setHealthCenters] = useState<any[]>([]);
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role') || 'Registered Surgical Assistant';
 
@@ -28,6 +29,13 @@ const EditFormPage: React.FC = () => {
         setLoading(false);
       });
   }, [id]);
+
+  useEffect(() => {
+    fetch('/api/health-centers')
+      .then(res => res.json())
+      .then(setHealthCenters)
+      .catch(() => setHealthCenters([]));
+  }, []);
 
   // Accept <select> as well for handleChange
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -142,7 +150,18 @@ const EditFormPage: React.FC = () => {
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Health Center Name</label>
-              <input type="text" name="healthCenterName" value={form.healthCenterName} onChange={handleChange} required style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }} />
+              <select
+                name="healthCenterName"
+                value={form.healthCenterName}
+                onChange={handleChange}
+                required
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
+              >
+                <option value="">Select Health Center</option>
+                {healthCenters.map((hc: any) => (
+                  <option key={hc.id} value={hc.name}>{hc.name}</option>
+                ))}
+              </select>
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Time In</label>
