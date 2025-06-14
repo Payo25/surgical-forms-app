@@ -224,12 +224,12 @@ const CallHoursPage: React.FC = () => {
                                       style={{
                                         cursor: userRole === 'Business Assistant' && !exportingPDF ? 'pointer' : 'default',
                                         fontWeight: 700,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         color: isFull ? '#185a9d' : '#05a117', // blue for Full, green for Half
                                         background: userRole === 'Business Assistant' && !exportingPDF ? 'rgba(24,90,157,0.07)' : 'none',
                                         borderRadius: 4,
-                                        padding: '2px 6px',
-                                        marginRight: 8,
+                                        padding: '2px 3px',
+                                        marginRight: 2,
                                         transition: 'color 0.2s, background 0.2s',
                                         userSelect: 'none',
                                       }}
