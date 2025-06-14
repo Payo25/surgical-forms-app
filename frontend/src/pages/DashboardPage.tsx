@@ -135,6 +135,26 @@ const DashboardPage: React.FC = () => {
               Payroll
             </a>
           )}
+          {localStorage.getItem('role') === 'Business Assistant' && (
+            <a href="/forms-report" style={{
+              display: 'inline-block',
+              padding: '12px 0',
+              background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 6,
+              fontSize: 16,
+              fontWeight: 600,
+              textDecoration: 'none',
+              boxShadow: '0 2px 8px rgba(67,206,162,0.08)',
+              transition: 'background 0.2s',
+            }}
+            tabIndex={0}
+            aria-label="Surgical Forms Report"
+            >
+              Surgical Forms Report
+            </a>
+          )}
         </div>
         <button
           onClick={() => navigate('/call-hours')}

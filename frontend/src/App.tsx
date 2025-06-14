@@ -11,6 +11,7 @@ import UserManagementPage from './pages/UserManagementPage';
 import AuditLogsPage from './pages/AuditLogsPage';
 import CallHoursPage from './pages/CallHoursPage';
 import PayrollPage from './pages/RSAReportPage';
+import FormsReportPage from './pages/FormsReportPage';
 import './App.css';
 
 const bgStyle: React.CSSProperties = {
@@ -106,6 +107,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/forms-report" element={<FormsReportPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
