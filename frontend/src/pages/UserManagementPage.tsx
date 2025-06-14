@@ -18,6 +18,10 @@ const UserManagementPage: React.FC = () => {
   const [editFullName, setEditFullName] = useState('');
   const [editRole, setEditRole] = useState('');
   const [editEmail, setEditEmail] = useState('');
+  const [changingPasswordUser, setChangingPasswordUser] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordChangeError, setPasswordChangeError] = useState('');
+  const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role');
 
@@ -110,6 +114,31 @@ const UserManagementPage: React.FC = () => {
     if (res.ok) {
       setUsers(users.map(u => u.id === editingUser.id ? { ...u, role: editRole, fullName: editFullName, username: editEmail } : u));
       setEditingUser(null);
+    }
+  };
+
+  const openChangePassword = (user: any) => {
+    setChangingPasswordUser(user);
+    setNewPassword('');
+    setPasswordChangeError('');
+    setPasswordChangeSuccess('');
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!changingPasswordUser || !newPassword) return;
+    setPasswordChangeError('');
+    setPasswordChangeSuccess('');
+    const res = await fetch(`${API_URL}/${changingPasswordUser.id}/password`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: newPassword, actor: localStorage.getItem('user') })
+    });
+    if (res.ok) {
+      setPasswordChangeSuccess('Password changed successfully.');
+      setTimeout(() => setChangingPasswordUser(null), 1000);
+    } else {
+      setPasswordChangeError('Failed to change password.');
     }
   };
 
@@ -232,7 +261,7 @@ const UserManagementPage: React.FC = () => {
                         }}
                         aria-label={`Delete user ${user.username}`}
                       >
-                        Delete
+                        ❌
                       </button>
                       <button
                         onClick={() => openEditUser(user)}
@@ -246,11 +275,30 @@ const UserManagementPage: React.FC = () => {
                           fontSize: 14,
                           cursor: 'pointer',
                           boxShadow: '0 2px 8px rgba(67,206,162,0.08)',
-                          transition: 'background 0.2s'
+                          transition: 'background 0.2s',
+                          marginRight: 8
                         }}
                         aria-label={`Edit user ${user.username}`}
                       >
-                        Edit
+                        ✏
+                      </button>
+                      <button
+                        onClick={() => openChangePassword(user)}
+                        style={{
+                          padding: '6px 16px',
+                          borderRadius: 6,
+                          background: 'linear-gradient(90deg, #ffb347 0%, #ffcc33 100%)',
+                          color: '#2d3a4b',
+                          border: 'none',
+                          fontWeight: 600,
+                          fontSize: 14,
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 8px rgba(255,204,51,0.08)',
+                          transition: 'background 0.2s',
+                        }}
+                        aria-label={`Change password for ${user.username}`}
+                      >
+                        🔑
                       </button>
                     </td>
                   </tr>
@@ -299,6 +347,32 @@ const UserManagementPage: React.FC = () => {
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
                       <button type="button" onClick={() => setEditingUser(null)} style={{ padding: '8px 20px', borderRadius: 6, background: '#eee', color: '#2d3a4b', border: 'none', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>Cancel</button>
                       <button type="submit" style={{ padding: '8px 20px', borderRadius: 6, background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)', color: '#fff', border: 'none', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>Save</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+            {/* Change Password Modal */}
+            {changingPasswordUser && (
+              <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div style={{ background: '#fff', padding: 32, borderRadius: 12, minWidth: 320, maxWidth: 400, width: '100%' }}>
+                  <h3>Change Password for {changingPasswordUser.fullName || changingPasswordUser.username}</h3>
+                  <form onSubmit={handleChangePassword} style={{ textAlign: 'left' }}>
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>New Password</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={e => setNewPassword(e.target.value)}
+                        required
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    {passwordChangeError && <div style={{ color: '#e74c3c', marginBottom: 12 }}>{passwordChangeError}</div>}
+                    {passwordChangeSuccess && <div style={{ color: '#43cea2', marginBottom: 12 }}>{passwordChangeSuccess}</div>}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                      <button type="button" onClick={() => setChangingPasswordUser(null)} style={{ padding: '8px 20px', borderRadius: 6, background: '#eee', color: '#2d3a4b', border: 'none', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>Cancel</button>
+                      <button type="submit" style={{ padding: '8px 20px', borderRadius: 6, background: 'linear-gradient(90deg, #ffb347 0%, #ffcc33 100%)', color: '#2d3a4b', border: 'none', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>Change</button>
                     </div>
                   </form>
                 </div>
