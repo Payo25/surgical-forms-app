@@ -17,7 +17,6 @@ const FormsListPage: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         const userId = localStorage.getItem('userId');
-        console.log('Type of userId:', typeof userId, 'Value:', userId);
         let filtered = data;
         if (userRole === 'Registered Surgical Assistant' && userId) {
           filtered = data.filter((form: any) => form.createdByUserId === parseInt(userId));
