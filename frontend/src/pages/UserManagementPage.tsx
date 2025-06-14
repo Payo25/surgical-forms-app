@@ -20,6 +20,7 @@ const UserManagementPage: React.FC = () => {
   const [editEmail, setEditEmail] = useState('');
   const [changingPasswordUser, setChangingPasswordUser] = useState<any>(null);
   const [newPassword, setNewPassword] = useState('');
+  const [retypePassword, setRetypePassword] = useState('');
   const [passwordChangeError, setPasswordChangeError] = useState('');
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState('');
   const navigate = useNavigate();
@@ -120,6 +121,7 @@ const UserManagementPage: React.FC = () => {
   const openChangePassword = (user: any) => {
     setChangingPasswordUser(user);
     setNewPassword('');
+    setRetypePassword('');
     setPasswordChangeError('');
     setPasswordChangeSuccess('');
   };
@@ -127,6 +129,10 @@ const UserManagementPage: React.FC = () => {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!changingPasswordUser || !newPassword) return;
+    if (newPassword !== retypePassword) {
+      setPasswordChangeError('Passwords do not match.');
+      return;
+    }
     setPasswordChangeError('');
     setPasswordChangeSuccess('');
     const res = await fetch(`${API_URL}/${changingPasswordUser.id}/password`, {
@@ -364,6 +370,16 @@ const UserManagementPage: React.FC = () => {
                         type="password"
                         value={newPassword}
                         onChange={e => setNewPassword(e.target.value)}
+                        required
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                      <label style={{ display: 'block', marginBottom: 6, color: '#2d3a4b', fontWeight: 500 }}>Retype New Password</label>
+                      <input
+                        type="password"
+                        value={retypePassword}
+                        onChange={e => setRetypePassword(e.target.value)}
                         required
                         style={{ width: '100%', padding: '10px 12px', borderRadius: 6, border: '1px solid #bfc9d9', fontSize: 16, outline: 'none', boxSizing: 'border-box' }}
                       />

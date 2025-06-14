@@ -252,6 +252,22 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
+// --- Password change endpoint ---
+app.put('/api/users/:id/password', async (req, res) => {
+  const userId = req.params.id;
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: 'New password is required.' });
+  }
+  try {
+    const hashed = await bcrypt.hash(password, 10);
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, userId]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update password.' });
+  }
+});
+
 // --- Audit Logs API using PostgreSQL ---
 app.get('/api/audit-logs', async (req, res) => {
   try {
