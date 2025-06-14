@@ -195,7 +195,7 @@ const FormsListPage: React.FC = () => {
                       <button
                         onClick={() => navigate(`/forms/${form.id}`)}
                         style={{
-                          padding: '6px 16px',
+                          padding: '6px 10px',
                           borderRadius: 6,
                           background: 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)',
                           color: '#fff',
@@ -216,7 +216,7 @@ const FormsListPage: React.FC = () => {
                         <button
                           onClick={() => navigate(`/forms/${form.id}/edit`)}
                           style={{
-                            padding: '6px 16px',
+                            padding: '6px 10px',
                             borderRadius: 6,
                             background: 'linear-gradient(90deg, #667eea 0%, #5a67d8 100%)',
                             color: '#fff',
@@ -250,7 +250,7 @@ const FormsListPage: React.FC = () => {
                             }
                           }}
                           style={{
-                            padding: '6px 16px',
+                            padding: '6px 10px',
                             borderRadius: 6,
                             background: 'linear-gradient(90deg, #e74c3c 0%, #e67e22 100%)',
                             color: '#fff',
