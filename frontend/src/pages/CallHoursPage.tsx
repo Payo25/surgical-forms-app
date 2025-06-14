@@ -237,9 +237,6 @@ const CallHoursPage: React.FC = () => {
                                       tabIndex={userRole === 'Business Assistant' && !exportingPDF ? 0 : -1}
                                     >
                                       {rsa.fullName || rsa.username}
-                                      <span style={{ marginLeft: 6, fontWeight: 700, fontSize: 15 }}>
-                                        ({a.shift})
-                                      </span>
                                     </span>
                                     {userRole === 'Business Assistant' && !exportingPDF && (
                                       <button
@@ -311,7 +308,7 @@ const CallHoursPage: React.FC = () => {
           <span style={{ fontWeight: 600 }}>Shift type:</span>
           <span>
             <span style={{ color: '#185a9d', fontWeight: 700, fontSize: 16 }}>Full</span> (24 hours on weekends, and 16 hours on weekdays),
-            <span style={{ marginLeft: 16 }}>
+            <span style={{ marginLeft: 2 }}>
               <span style={{ color: '#05a117', fontWeight: 700, fontSize: 16 }}>Half</span> (12 hours on weekends, and 8 hours on weekdays).
             </span>
           </span>
